@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "sh/spherical_harmonics.h"
+#include "spherical_harmonics.hpp"
 
 #include <iostream>
 #include <limits>
@@ -35,7 +35,7 @@ const int kIrradianceCoeffCount = GetCoefficientCount(kIrradianceOrder);
 // spherical harmonic coefficients are hardcoded below. This was computed by
 // evaluating:
 //   ProjectFunction(kIrradianceOrder, [] (double phi, double theta) {
-//     return Clamp(Eigen::Vector3d::UnitZ().dot(ToVector(phi, theta)), 
+//     return Clamp(Eigen::Vector3d::UnitZ().dot(ToVector(phi, theta)),
 //                  0.0, 1.0);
 //   }, 10000000);
 const std::vector<double> cosine_lobe = { 0.886227, 0.0, 1.02333, 0.0, 0.0, 0.0,
@@ -703,7 +703,7 @@ std::unique_ptr<std::vector<Eigen::Array3f>> ProjectEnvironment(
 }
 
 std::unique_ptr<std::vector<double>> ProjectSparseSamples(
-    int order, const std::vector<Eigen::Vector3d>& dirs, 
+    int order, const std::vector<Eigen::Vector3d>& dirs,
     const std::vector<double>& values) {
   CHECK(order >= 0, "Order must be at least zero.");
   CHECK(dirs.size() == values.size(),
@@ -762,7 +762,7 @@ T EvalSHSum(int order, const std::vector<T>& coeffs, double phi, double theta) {
 }
 
 template <typename T>
-T EvalSHSum(int order, const std::vector<T>& coeffs, 
+T EvalSHSum(int order, const std::vector<T>& coeffs,
             const Eigen::Vector3d& dir) {
   if (order > kHardCodedOrderLimit) {
     // It is faster to switch to spherical coordinates
@@ -787,6 +787,30 @@ T EvalSHSum(int order, const std::vector<T>& coeffs,
 Rotation::Rotation(int order, const Eigen::Quaterniond& rotation)
     : order_(order), rotation_(rotation) {
   band_rotations_.reserve(GetCoefficientCount(order));
+}
+
+std::unique_ptr<Rotation> Rotation::Create(
+    int order, const Eigen::Matrix3d& rotation) {
+  CHECK(order >= 0, "Order must be at least 0.");
+
+  // TODO: invalid quaternion just to pass constructor
+  std::unique_ptr<Rotation> sh_rot(new Rotation(order, Eigen::Quaterniond{0,0,0,0}));
+
+  // Order 0 (first band) is simply the 1x1 identity since the SH basis
+  // function is a simple sphere.
+  Eigen::MatrixXd r(1, 1);
+  r(0, 0) = 1.0;
+  sh_rot->band_rotations_.push_back(r);
+
+  sh_rot->band_rotations_.push_back(rotation);
+
+  // Recursively build the remaining band rotations, using the equations
+  // provided in [4, 4b].
+  for (int l = 2; l <= order; l++) {
+    ComputeBandRotation(l, &(sh_rot->band_rotations_));
+  }
+
+  return sh_rot;
 }
 
 std::unique_ptr<Rotation> Rotation::Create(

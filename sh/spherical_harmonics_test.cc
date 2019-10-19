@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "sh/default_image.h"
-#include "sh/spherical_harmonics.h"
+#include "default_image.hpp"
+#include "spherical_harmonics.hpp"
 #include "gtest/gtest.h"
 
 namespace sh {
@@ -268,9 +268,9 @@ TEST(SphericalHarmonicsTest, GetCoefficientCount) {
 
 TEST(SphericalHarmonicsTest, ToVector) {
   // Compare spherical coordinates with their known direction vectors.
-  EXPECT_TUPLE3_NEAR(Eigen::Vector3d(1, 0, 0), ToVector(0.0, M_PI / 2), 
+  EXPECT_TUPLE3_NEAR(Eigen::Vector3d(1, 0, 0), ToVector(0.0, M_PI / 2),
                      kEpsilon);
-  EXPECT_TUPLE3_NEAR(Eigen::Vector3d(0, 1, 0), ToVector(M_PI / 2, M_PI / 2), 
+  EXPECT_TUPLE3_NEAR(Eigen::Vector3d(0, 1, 0), ToVector(M_PI / 2, M_PI / 2),
                      kEpsilon);
   EXPECT_TUPLE3_NEAR(Eigen::Vector3d(0, 0, 1), ToVector(0.0, 0.0), kEpsilon);
   EXPECT_TUPLE3_NEAR(Eigen::Vector3d(0.5, 0.5, sqrt(0.5)),
@@ -877,7 +877,7 @@ TEST(SphericalHarmonicsTest, ImageCoordsToSphericalCoordsTest) {
 
 TEST(SphericalHarmonicsTest, SphericalCoordsToImageCoordsTest) {
   EXPECT_TUPLE2_NEAR(Eigen::Vector2d(0.0, 0.0),
-                     ToImageCoords(0.0, 0.0, kImageWidth, kImageHeight), 
+                     ToImageCoords(0.0, 0.0, kImageWidth, kImageHeight),
                      kEpsilon);
 
   EXPECT_TUPLE2_NEAR(Eigen::Vector2d(kImageWidth / 2.0, kImageHeight / 2.0),
@@ -896,7 +896,7 @@ TEST(SphericalHarmonicsTest, SphericalCoordsToImageCoordsTest) {
   // 180 in the xy plane (full rotation to bring it into range, and a 180
   // adjust for the z axis).
   EXPECT_TUPLE2_NEAR(Eigen::Vector2d(kImageWidth / 2 - 0.5, 0.5),
-                     ToImageCoords(-M_PI / kImageWidth, 
+                     ToImageCoords(-M_PI / kImageWidth,
                                    -0.5 * M_PI / kImageHeight,
                                    kImageWidth, kImageHeight), kEpsilon);
 
@@ -935,7 +935,7 @@ TEST(SphericalHarmonicsTest, RenderDiffuseIrradianceTest) {
 
   Eigen::Array3f diffuse_irradiance = RenderDiffuseIrradiance(
       env_rgb, Eigen::Vector3d::UnitZ());
-  EXPECT_TUPLE3_NEAR(Eigen::Array3f(M_PI, M_PI, M_PI), diffuse_irradiance, 
+  EXPECT_TUPLE3_NEAR(Eigen::Array3f(M_PI, M_PI, M_PI), diffuse_irradiance,
                      kIrradianceError);
 }
 
@@ -999,7 +999,7 @@ TEST(SphericalHarmonicsTest, RenderDiffuseIrradianceFewCoefficientsTest) {
 
 TEST(SphericalHarmonicUtilsTest, RenderDiffuseIrradianceNoCoefficientsTest) {
   EXPECT_TUPLE3_NEAR(Eigen::Array3f(0.0, 0.0, 0.0),
-                     RenderDiffuseIrradiance({}, Eigen::Vector3d::UnitZ()), 
+                     RenderDiffuseIrradiance({}, Eigen::Vector3d::UnitZ()),
                      kEpsilon);
 }
 

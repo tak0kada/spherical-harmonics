@@ -12,31 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Simple in-memory image implementation.
-#ifndef SH_DEFAULT_IMAGE_H
-#define SH_DEFAULT_IMAGE_H
+// A very simple image interface that reports image dimensions and allows
+// for setting and getting individual pixels. Implement the interface by
+// wrapping the image library of your choice.
 
-#include "sh/image.h"
+#ifndef SH_IMAGE_H
+#define SH_IMAGE_H
+
+#include <memory>
+
+#include "eigen3/Eigen/Dense"
 
 namespace sh {
 
-class DefaultImage : public Image {
+class Image {
  public:
-  DefaultImage(int width, int height);
-  
-  int width() const override;
-  int height() const override;
+  Image() {}
+  virtual ~Image() {}
 
-  Eigen::Array3f GetPixel(int x, int y) const override;
-  void SetPixel(int x, int y, const Eigen::Array3f& v) override;
+  virtual int width() const = 0;
+  virtual int height() const = 0;
 
- private:
-  const int width_;
-  const int height_;
-
-  std::unique_ptr<Eigen::Array3f[]> pixels_;
+  virtual Eigen::Array3f GetPixel(int x, int y) const = 0;
+  virtual void SetPixel(int x, int y, const Eigen::Array3f& v) = 0;
 };
 
 }  // namespace sh
 
-#endif  // SH_DEFAULT_IMAGE_H
+#endif  // IMAGE_H
