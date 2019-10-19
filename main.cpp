@@ -1,4 +1,4 @@
-#include "spherical-harmonics/sh/spherical_harmonics.hpp"
+#include "spherical_harmonics.hpp"
 #include <iostream>
 #include <memory>
 #include <eigen3/Eigen/Core>
