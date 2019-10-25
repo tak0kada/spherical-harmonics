@@ -802,7 +802,17 @@ std::unique_ptr<Rotation> Rotation::Create(
   r(0, 0) = 1.0;
   sh_rot->band_rotations_.push_back(r);
 
-  sh_rot->band_rotations_.push_back(rotation);
+  r.resize(3,3);
+  r(0, 0) =  rotation(1, 1);
+  r(0, 1) = -rotation(1, 2);
+  r(0, 2) =  rotation(1, 0);
+  r(1, 0) = -rotation(2, 1);
+  r(1, 1) =  rotation(2, 2);
+  r(1, 2) = -rotation(2, 0);
+  r(2, 0) =  rotation(0, 1);
+  r(2, 1) = -rotation(0, 2);
+  r(2, 2) =  rotation(0, 0);
+  sh_rot->band_rotations_.push_back(r);
 
   // Recursively build the remaining band rotations, using the equations
   // provided in [4, 4b].
